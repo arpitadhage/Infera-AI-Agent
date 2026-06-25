@@ -1,4 +1,4 @@
-from os import path
+# from os import path
 
 from backend.agents.router import Router
 from backend.agents.planner import Planner
@@ -23,6 +23,8 @@ class Agent:
 
         file_types = []
 
+        
+
         if file_path.lower().endswith(".pdf"):
             file_types.append("pdf")
 
@@ -36,6 +38,7 @@ class Agent:
             intent=intent,
             file_types=file_types
         )
+
 
         state = {
             "file_path": file_path,
@@ -66,7 +69,7 @@ if __name__ == "__main__":
     #     file_types=["pdf"]
     # )
 
-    # print("\nFinal Response:")
+    print("\nFinal Response:")
     # print(response)
     response = agent.run(
     query="Summarize this PDF",
@@ -80,6 +83,15 @@ if __name__ == "__main__":
     # response = agent.run(
     # query="Summarize this audio",
     # file_path="sample_data/sample_audio.mp4"
+    # )
+
+    # response = agent.run(
+    # query="Summarize all content",
+    # file_paths=[
+    #     "sample_data/project_ytlink.pdf",
+    #     "sample_data/sample1.jpeg",
+    #     "sample_data/sample_audio.mp4"
+    # ]
     # )
 
     print(response)
