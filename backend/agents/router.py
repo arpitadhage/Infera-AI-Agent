@@ -27,6 +27,11 @@ class Router:
                 "intent": "comparison",
                 "needs_clarification": False
             }
+        if query.lower() in ["hi", "hello", "hey", "what can you do", "help"]:
+            return {
+                "intent": "conversation",
+                "needs_clarification": False
+    }
 
         return {
             "intent": None,

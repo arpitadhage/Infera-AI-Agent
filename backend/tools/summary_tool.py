@@ -1,53 +1,65 @@
-from collections import Counter
-import re
+#from backend.tools.groq_client import generate
+from backend.tools.groq_client import call_groq
 
 
-def clean_text(text: str):
+def summarize(state):
 
-    # remove bullet points and weird chars
-    text = text.replace("\uf0b7", "")
-    text = text.replace("\n", " ")
+    print("Executing: summarize")
 
-    return text
+    all_text = ""
+    
 
+    # PDF text
+    for item in state["contents"]["pdf"]:
+        all_text += item.get("text", "") + "\n"
 
-def summarize(state: dict):
+    # Image OCR text
+    for item in state["contents"]["image"]:
+        all_text += item.get("text", "") + "\n"
 
-    text = state.get("text", "")
+    # Audio transcript
+    for item in state["contents"]["audio"]:
+        all_text += item.get("text", "") + "\n"
 
-    if not text:
-        state["summary"] = "No text found"
+    # YouTube transcript
+    for item in state["contents"]["youtube"]:
+        all_text += item.get("text", "") + "\n"
+
+    # URL-based text (optional future use)
+    for item in state.get("contents", {}).get("urls", []):
+        all_text += str(item) + "\n"
+
+    MAX_CHARS = 8000
+
+    all_text = all_text[:MAX_CHARS]
+
+    if not all_text.strip():
+        state["summary"] = "No content found to summarize"
         return state
 
-    # CLEAN
-    text = clean_text(text)
+    prompt = f"""
+You are an expert AI assistant.
 
-    # SPLIT SENTENCES PROPERLY
-    sentences = re.split(r'(?<=[.!?])\s+', text)
-    sentences = [s.strip() for s in sentences if len(s.strip()) > 20]
+Your task is to summarize the following multimodal content.
 
-    # WORD FREQUENCY
-    words = re.findall(r'\w+', text.lower())
-    freq = Counter(words)
+Return strictly in this format:
 
-    # SCORE SENTENCES
-    scores = {}
+1. One line summary
+2. 3 bullet points
+3. Detailed explanation
+4. Cross-Input Relationship:
+   - Connected / Partially Connected / Not Related
+   - Reasoning
 
-    for sent in sentences:
-        score = 0
-        for word in re.findall(r'\w+', sent.lower()):
-            score += freq[word]
-        scores[sent] = score
+CONTENT:
+{all_text}
+"""
 
-    ranked = sorted(scores, key=scores.get, reverse=True)
+    try:
+        summary = call_groq(prompt)
+        state["summary"] = summary
 
-    top = ranked[:5]
-
-    # FIXED OUTPUT FORMAT
-    state["summary"] = {
-        "1_line": top[0] if top else "",
-        "3_bullets": top[:3],
-        "5_sentence": " ".join(top[:5])
-    }
+    except Exception as e:
+        state["summary"] = f"Summarization failed: {str(e)}"
 
     return state

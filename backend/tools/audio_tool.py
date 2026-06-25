@@ -7,41 +7,29 @@ model = WhisperModel(
     compute_type="int8"
 )
 
-
 def transcribe_audio(state):
 
-    audio_path = state["file_path"]
+    files = state.get("files", [])
 
-    segments, info = model.transcribe(audio_path)
+    audio_texts = []
 
-    transcript = ""
+    for file_path in files:
 
-    for segment in segments:
-        transcript += segment.text + " "
-    
-    transcript = transcript.strip()
+        if file_path.lower().endswith((".mp3", ".mp4", ".wav", ".m4a")):
 
-    state["contents"]["audio"].append(
-    {
-        "text": transcript,
-        "duration": info.duration,
-        # "audio_format": info.audio_format,
-    }
-    )
+            segments, info = model.transcribe(file_path)
+
+            transcript = ""
+
+            for segment in segments:
+                transcript += segment.text + " "
+
+            audio_texts.append({
+                "text": transcript.strip(),
+                "duration": getattr(info, "duration", None),
+                "source": file_path
+            })
+
+    state["contents"]["audio"] = audio_texts
 
     return state
-
-if __name__ == "__main__":
-
-    state = {
-        "file_path": "sample_data/sample_audio.mp4",
-        "contents": {
-            "pdf": [],
-            "image": [],
-            "audio": []
-        }
-    }
-
-    result = transcribe_audio(state)
-
-    print(result)

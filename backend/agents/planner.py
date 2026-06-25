@@ -1,45 +1,47 @@
 class Planner:
 
-    def create_plan(self, intent: str, file_types: list) -> list:
+    def create_plan(self, intent, file_types):
 
         plan = []
 
-        # Input processing
-
+    # 1. INGESTION
         if "pdf" in file_types:
             plan.append("parse_pdf")
-            plan.append("detect_urls")
-            plan.append("process_urls")
-            plan.append("get_youtube_transcript")
 
         if "image" in file_types:
             plan.append("extract_image_text")
-            plan.append("detect_urls")
-            plan.append("process_urls")
-            plan.append("get_youtube_transcript")
 
         if "audio" in file_types:
             plan.append("transcribe_audio")
 
-        # Task processing
+    # 2. URL PROCESSING (AFTER EXTRACTION)
+        plan.append("detect_urls")
+        plan.append("process_urls")
 
-        # if "youtube" in intent:
-        #     plan.append("get_youtube_transcript")
+    # 3. CONTEXT BUILDING
+        plan.append("build_unified_context")
 
+    # 4. TASK LAYER (ONLY ONE MAIN TASK)
         if intent == "summarization":
             plan.append("summarize")
 
         elif intent == "sentiment_analysis":
             plan.append("analyze_sentiment")
 
+        elif intent == "cross_input_reasoning":
+            plan.append("cross_input_reason")
+
         elif intent == "code_explanation":
             plan.append("explain_code")
+        
+        if intent == "conversation":
+            return["conversation"]
 
-        elif intent == "comparison":
-            plan.append("compare_content")
-
-        elif intent == "qa":
+        if intent == "qa":
             plan.append("answer_question")
+
+    # 5. FINAL CLEANUP
+        plan = list(dict.fromkeys(plan))  # remove duplicates
 
         return plan
     
