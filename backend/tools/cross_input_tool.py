@@ -2,48 +2,42 @@ from backend.tools.groq_client import call_groq
 
 def cross_input_reason(state):
 
-    print("Executing: cross_input_reason")
+    texts = state["contents"]
 
-    pdf = state["contents"].get("pdf", [])
-    image = state["contents"].get("image", [])
-    audio = state["contents"].get("audio", [])
-    youtube = state["contents"].get("youtube", [])
+    all_text = ""
 
-    combined_text = ""
+    for k in texts:
+        for item in texts[k]:
+            all_text += item.get("text", "") + "\n"
 
-    for item in pdf:
-        combined_text += item.get("text", "") + "\n"
-
-    for item in image:
-        combined_text += item.get("text", "") + "\n"
-
-    for item in audio:
-        combined_text += item.get("text", "") + "\n"
-
-    for item in youtube:
-        combined_text += item.get("text", "") + "\n"
-
-    if not combined_text.strip():
-        state["cross_input"] = "No data to compare"
+    if not all_text.strip():
+        state["cross_input"] = {
+            "relation": "no_data",
+            "reason": "No content found"
+        }
         return state
 
     prompt = f"""
-You are an expert AI reasoning engine.
+You are a cross-input reasoning system.
 
-Compare and analyze ALL sources below.
+Analyze if all inputs are related or not.
 
-Task:
-- Find if they talk about same topic
-- Identify similarities
-- Identify differences
-- Give final conclusion
+Rules:
+1. If topics are same → mark "CONNECTED"
+2. If partially related → "PARTIALLY_CONNECTED"
+3. If different → "NOT_CONNECTED"
+
+Also explain:
+- main topics
+- similarity score (0-100)
+- reasoning
 
 CONTENT:
-{combined_text}
+{all_text}
 """
 
-    response = call_groq(prompt)
+    result = call_groq(prompt)
 
-    state["cross_input"] = response
+    state["cross_input"] = result
 
     return state

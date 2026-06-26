@@ -26,20 +26,3 @@ def detect_urls(state):
     return state
 
 
-if __name__ == "__main__":
-
-    state = {
-        "text": """
-        Meeting notes
-
-        Watch this:
-        https://www.youtube.com/watch?v=jNQXAC9IVRw
-
-        Docs:
-        https://docs.python.org
-        """
-    }
-
-    result = detect_urls(state)
-
-    print(result)

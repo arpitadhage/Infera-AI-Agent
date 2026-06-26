@@ -25,7 +25,7 @@ def summarize(state):
     for item in state["contents"]["youtube"]:
         all_text += item.get("text", "") + "\n"
 
-    # URL-based text (optional future use)
+    # URL-based text 
     for item in state.get("contents", {}).get("urls", []):
         all_text += str(item) + "\n"
 
@@ -47,10 +47,44 @@ Return strictly in this format:
 1. One line summary
 2. 3 bullet points
 3. Detailed explanation
+
+
+You are an expert multimodal AI agent.
+
+You will receive extracted content from multiple sources:
+
+- PDF text
+- Image OCR text
+- Audio transcript
+- YouTube transcript
+- Code snippets
+- User query
+
+Your job is to:
+
+1. Understand user intent (even if unclear)
+2. Decide best response type:
+   - Summarization
+   - Sentiment analysis
+   - Code explanation
+   - Question answering
+   - Conversation
+3. If multiple inputs exist:
+   - Analyze relationship between them
+
 4. Cross-Input Relationship:
    - Connected / Partially Connected / Not Related
-   - Reasoning
+   - Explain reasoning clearly
 
+5. Always respond in this format:
+
+Response:
+ Final Answer 
+
+Analysis:
+- Type of task detected
+- Reasoning
+- Cross-input relationship (if applicable)
 CONTENT:
 {all_text}
 """

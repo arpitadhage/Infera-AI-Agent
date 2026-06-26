@@ -5,7 +5,7 @@ load_dotenv()
 
 try:
     from groq import Groq
-except ModuleNotFoundError:  # pragma: no cover - defensive fallback
+except ModuleNotFoundError:  
     Groq = None
 
 client = None

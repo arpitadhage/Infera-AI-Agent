@@ -1,154 +1,98 @@
-# from os import path
-
-from importlib.resources import files
-
+import os
 from backend.agents.router import Router
 from backend.agents.planner import Planner
 from backend.agents.executor import Executor
 from dotenv import load_dotenv
 
-from streamlit_app import clean_response
 load_dotenv()
 
-class Agent:
+EXT_TYPE_MAP = {
+    ".pdf":  "pdf",
+    ".png":  "image", ".jpg": "image", ".jpeg": "image", ".webp": "image", ".bmp": "image",
+    ".mp3":  "audio", ".mp4": "audio", ".wav":  "audio", ".m4a": "audio", ".ogg": "audio",
+    ".docx": "docx",
+    ".py":   "code",  ".java": "code", ".cpp":  "code", ".js":  "code",
+    ".c":    "code",  ".cs":   "code", ".rb":   "code", ".go":  "code",
+    ".php":  "code",  ".ts":   "code", ".html": "code", ".rs":  "code",
+    ".txt":  "txt",   ".md":   "txt",  ".csv":  "txt",  ".log": "txt",
+}
 
+
+def _classify_files(file_paths: list) -> list:
+    types, seen = [], set()
+    for path in file_paths:
+        if not isinstance(path, str) or not path:
+            continue
+        ext = os.path.splitext(path)[1].lower()
+        ftype = EXT_TYPE_MAP.get(ext)
+        if ftype and ftype not in seen:
+            seen.add(ftype)
+            types.append(ftype)
+    return types
+
+
+class Agent:
     def __init__(self):
-        self.router = Router()
-        self.planner = Planner()
+        self.router   = Router()
+        self.planner  = Planner()
         self.executor = Executor()
 
-    def run(self, query: str, file_path):
+    def run(self, query: str, file_path) -> dict:
+        # 1. Normalize paths
+        if isinstance(file_path, list):
+            files = [p for p in file_path if isinstance(p, str) and p]
+        elif isinstance(file_path, str) and file_path:
+            files = [file_path]
+        else:
+            files = []
 
-        routing = self.router.detect_intent(query)
-    
-        if routing["needs_clarification"]:
-            return routing
+        # 2. Classify
+        file_types = _classify_files(files)
+
+        # 3. Route
+        routing = self.router.detect_intent(query, file_types=file_types)
+        if routing.get("needs_clarification"):
+            return {"response": routing.get("message", "Please clarify."), "plan": []}
 
         intent = routing["intent"]
 
-        file_types = []
+        # 4. Plan
+        plan = self.planner.create_plan(intent=intent, file_types=file_types)
 
-        files = file_path if isinstance(file_path, list) else [file_path]
-
-        for path in files:
-
-            if path.lower().endswith(".pdf"):
-                file_types.append("pdf")
-
-            if path.lower().endswith((".png", ".jpg", ".jpeg")):
-                file_types.append("image")
-
-            if path.lower().endswith((".mp3",".mp4", ".wav", ".m4a")):
-                file_types.append("audio")
-        
-            if path.lower().endswith(".docx"):
-                file_types.append("docx")
-
-            if path.endswith((".py", ".java", ".cpp", ".js", ".c", ".cs", ".rb", ".go", ".php", ".ts")):
-                file_types.append("code")
-
-        plan = self.planner.create_plan(
-            intent=intent,
-            file_types=file_types
-        )
-
-
+        # 5. State
         state = {
             "files": files,
             "query": query,
-                "contents": {
-                    "pdf": [],
-                    "image": [],
-                    "audio": [],
-                    "youtube": [],
-                    "docx": [],
-                    "code": [],
-                    "text": []
-                 },
-                 "unified_context": "" 
+            "contents": {
+                "pdf": [], "image": [], "audio": [],
+                "docx": [], "code": [], "text": [], "youtube": [],
+            },
+            "unified_context": "",
         }
 
+        # 6. Execute
         final_state, logs = self.executor.execute(plan, state)
 
-        clean_response = {
-             "response": (
-                final_state.get("summary")
-                or final_state.get("sentiment")
-                or final_state.get("explanation")
-                or final_state.get("code_explanation")
-                or final_state.get("response")
-                or "No response generated"
-        ),
+        # 7. Response 
+        response = next(
+            (v for v in [
+                final_state.get("cross_input"),
+                final_state.get("summary"),
+                final_state.get("sentiment"),
+                final_state.get("code_explanation"),
+                final_state.get("response"),
+            ] if v),
+            "⚠️ No response generated. Check your GROQ_API_KEY in .env"
+        )
 
-        "plan": plan,
+       
+        raw = final_state.get("contents", {})
+        extracted_text = {k: v for k, v in raw.items() if v}
 
-        # optional (for debugging / UI trace)
-        "extracted_text": final_state.get("contents", {})
-    }
-
-        return clean_response
-        
-        
-        
-
-# if __name__ == "__main__":
-
-#     agent = Agent()
-
-    # response = agent.run(
-    #     query="Summarize this PDF",
-    #     file_types=["pdf"]
-    # )
-
-    # print("\nFinal Response:")
-    # print(response)
-    # response = agent.run(
-    # query="Summarize this PDF",
-    # file_path="sample_data/project_ytlink.pdf"
-    # )
-
-    # response = agent.run(
-    # query="Summarize this image",
-    # file_path="sample_data/sample1.jpeg"
-    # )
-    # response = agent.run(
-    # query="Summarize this audio",
-    # file_path="sample_data/sample_audio.mp4"
-    # )
-
-    # response = agent.run(
-    # query="Summarize all content",
-    # file_paths=[
-    #     "sample_data/project_ytlink.pdf",
-    #     "sample_data/sample1.jpeg",
-    #     "sample_data/sample_audio.mp4"
-    # ]
-    # )
-#     response = agent.run(
-#     query="Analyze sentiment",
-#     file_path="sample_data/review2.txt"
-# )
-# response = agent.run(
-#         query="hello",
-#         file_path=""
-#     )
-# print(response)
-
-# response = agent.run(
-#     query="Explain this code",
-#     file_path="sample_data/test.py"
-# )
-
-# print(response["final_state"]["code_explanation"])
-   
-
-# response = agent.run(
-#     query="Summarize this PDF + image + audio",
-#     file_path=[
-#         "sample_data/sample.pdf",
-#         "sample_data/sample1.jpeg",
-#         "sample_data/sample_audio.mp4"
-#     ]
-# )
-
-# print(response["final_state"]["summary"])
+        return {
+            "response":      response,
+            "plan":          plan,
+            "logs":          logs,
+            "intent":        intent,
+            "extracted_text": extracted_text,
+        }

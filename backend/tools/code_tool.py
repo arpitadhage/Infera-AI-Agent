@@ -3,16 +3,23 @@ from backend.tools.groq_client import call_groq
 
 
 def extract_code(state):
-    file_path = state["file_path"]
 
-    with open(file_path, "r", encoding="utf-8") as f:
-        code = f.read()
+    code_files = state["contents"].get("code", [])
 
-    state["contents"]["code"] = [{
-        "text": code
-    }]
+    if not code_files:
+        return {
+            "explanation": "No code found",
+            "bugs": [],
+            "time_complexity": "Unknown"
+        }
 
-    return state
+    code = "\n".join([c["text"] for c in code_files if "text" in c])
+
+    return {
+        "explanation": f"Analyzing code:\n{code}",
+        "bugs": [],
+        "time_complexity": "O(n)"
+    }
 
 def explain_code(state):
 

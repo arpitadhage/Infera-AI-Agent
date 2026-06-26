@@ -23,15 +23,3 @@ def process_urls(state):
     return state
 
 
-if __name__ == "__main__":
-
-    state = {
-        "urls": [
-            "https://www.youtube.com/watch?v=jNQXAC9IVRw",
-            "https://docs.python.org"
-        ]
-    }
-
-    result = process_urls(state)
-
-    print(result)

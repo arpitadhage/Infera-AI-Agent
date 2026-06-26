@@ -1,57 +1,58 @@
 class Planner:
+    """
+    Creates a deterministic, ordered execution plan based on intent + file types.
+    Guarantees: extraction always happens before analysis, no duplicate steps.
+    """
 
-    def create_plan(self, intent, file_types):
+    # Maps file type → extraction tool name
+    EXTRACT_TOOL_MAP = {
+        "pdf":   "extract_pdf_text",
+        "image": "extract_image_text",
+        "audio": "transcribe_audio",
+        "docx":  "extract_docx_text",
+        "code":  "extract_code",
+        "txt":   "extract_text",
+        "youtube": "fetch_youtube_transcript",
+    }
 
-        plan = []
+    def create_plan(self, intent: str, file_types: list[str]) -> list[str]:
+        plan: list[str] = []
+        seen: set[str] = set()
 
-    # 1. INGESTION
-        if "pdf" in file_types:
-            plan.append("parse_pdf")
+        def add(step: str):
+            if step not in seen:
+                seen.add(step)
+                plan.append(step)
 
-        if "image" in file_types:
-            plan.append("extract_image_text")
+        # ── 1. Extraction phase (one tool per unique file type) ──────────────
+        for ft in file_types:
+            tool = self.EXTRACT_TOOL_MAP.get(ft)
+            if tool:
+                add(tool)
 
-        if "audio" in file_types:
-            plan.append("transcribe_audio")
-
-    # 2. URL PROCESSING (AFTER EXTRACTION)
-        plan.append("detect_urls")
-        plan.append("process_urls")
-
-    # 3. CONTEXT BUILDING
-        plan.append("build_unified_context")
-
-    # 4. TASK LAYER (ONLY ONE MAIN TASK)
-        if intent == "summarization":
-            plan.append("summarize")
-
-        elif intent == "sentiment_analysis":
-            plan.append("analyze_sentiment")
-
-        elif intent == "cross_input_reasoning":
-            plan.append("cross_input_reason")
+        # ── 2. Analysis / reasoning phase ────────────────────────────────────
+        if intent == "sentiment_analysis":
+            # MUST have extracted text first
+            if not plan:
+                add("extract_text")          # fallback extractor
+            add("analyze_sentiment")
 
         elif intent == "code_explanation":
-            plan.append("explain_code")
-        
-        if intent == "conversation":
-            return["conversation"]
+            if not any(t in seen for t in ("extract_code",)):
+                add("extract_code")
+            add("explain_code")
 
-        if intent == "qa":
-            plan.append("answer_question")
+        elif intent in ("cross_input_reasoning", "comparison"):
+            add("build_unified_context")
+            add("compare_inputs") if intent == "comparison" else add("summarize")
 
-    # 5. FINAL CLEANUP
-        plan = list(dict.fromkeys(plan))  # remove duplicates
+        elif intent == "summarization":
+            add("summarize")
+
+        elif intent == "conversation":
+            add("chat_response")
+
+        else:
+            add("summarize")
 
         return plan
-    
-if __name__ == "__main__":
-
-    planner = Planner()
-
-    print(
-        planner.create_plan(
-            intent="summarization",
-            file_types=["pdf"]
-        )
-    )
