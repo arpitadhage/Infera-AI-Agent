@@ -2,67 +2,39 @@ __pycache__/
 *.pyc
 .env
 venv/
-.DS_Store
 temp/
 .streamlit/
 sample_data/
-
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Virtual Environment
 venv/
 env/
 .venv/
-
-# Environment Variables
 .env
 
-# -----------------------------
-# IDE
-# -----------------------------
 .vscode/
 .idea/
 *.swp
-
-# -----------------------------
-# OS Files
-# -----------------------------
 .DS_Store
 Thumbs.db
 
-# -----------------------------
-# Python Build
-# -----------------------------
 build/
 dist/
 *.egg-info/
 
-# -----------------------------
-# Logs
-# -----------------------------
+
 *.log
 
-# -----------------------------
-# Temporary Files
-# -----------------------------
+
 temp/
 tmp/
 
-# -----------------------------
-# Streamlit
-# -----------------------------
 .streamlit/
 
-# -----------------------------
-# Uploaded / Sample Files
-# -----------------------------
 sample_data/
 uploads/
 temp_files/
-
-# Ignore all PDFs, images, audio and videos
 *.pdf
 *.doc
 *.docx
@@ -99,4 +71,3 @@ backend/venv/lib/python3.11/site-packages/__pycache__/
 
 
 
-git rm -r --cached .
