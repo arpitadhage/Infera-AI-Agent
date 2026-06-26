@@ -104,7 +104,7 @@ Final Structured Text Output
 git clone https://github.com/arpitadhage/Infera-AI-Agent.git
 cd Infera-AI-Agent
 ```
-2️⃣ Create Virtual Environment
+### 2️⃣ Create Virtual Environment
 ```bash
 python -m venv venv
 ```
@@ -117,7 +117,7 @@ Mac/Linux
 ```bash
 source venv/bin/activate
 ```
-3️⃣ Install Dependencies
+### 3️⃣ Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
@@ -147,7 +147,7 @@ Run Container
 docker run -p 8000:8000 infera-ai-agent
 ```
 ---
-##🧪 Sample Test Cases
+## 🧪 Sample Test Cases
 
 ✅ Audio Understanding
 Input: Audio lecture
@@ -184,7 +184,7 @@ Final analytical answer
 
 ---
 
-##🧩 Design Decisions
+## 🧩 Design Decisions
 - Modular tool-based architecture
 - LLM acts only as planner, not executor
 - Strict no hallucination policy
@@ -195,5 +195,5 @@ Final analytical answer
 - Output formatting
 - Easily extensible for new tools
   ---
-##👨‍💻 Author
-Arpit Dhage
+## 👨‍💻 Author
+Arpita Dhage
