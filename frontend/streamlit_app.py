@@ -1,10 +1,12 @@
 import streamlit as st
 import requests
 
-# ─────────────────────────────────────────────────────────────────────────────
-# CONFIG
-# ─────────────────────────────────────────────────────────────────────────────
-API_URL = "http://127.0.0.1:8000/run-agent"
+
+import os
+
+BASE_URL = os.getenv("BACKEND_URL", "http://host.docker.internal:8000")
+
+API_URL = f"{BASE_URL}/run-agent"
 
 SUPPORTED_TYPES = [
     "pdf", "png", "jpg", "jpeg", "webp", "bmp",
@@ -23,15 +25,13 @@ INTENT_ICONS = {
 }
 
 st.set_page_config(
-    page_title="DataSmith AI Agent",
+    page_title="Infera AI Agent",
     page_icon="🤖",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# ─────────────────────────────────────────────────────────────────────────────
-# CSS
-# ─────────────────────────────────────────────────────────────────────────────
+
 st.markdown("""
 <style>
 .agent-title {
@@ -88,9 +88,7 @@ div.stButton > button:active{
 </style>
 """, unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────────────────────────────────────
-# SESSION STATE
-# ─────────────────────────────────────────────────────────────────────────────
+
 for key, default in [("chat", []), ("pending", None)]:
     if key not in st.session_state:
         st.session_state[key] = default
@@ -101,11 +99,9 @@ if "uploader_key" not in st.session_state:
 if "input_key" not in st.session_state:
         st.session_state.input_key = 0
 
-# ─────────────────────────────────────────────────────────────────────────────
-# SIDEBAR
-# ─────────────────────────────────────────────────────────────────────────────
+
 with st.sidebar:
-    st.markdown("## 🤖 DataSmith")
+    st.markdown("## 🤖 Infera AI")
     st.caption("Multi-Modal AI Agent · Groq-powered")
     st.divider()
     st.markdown("**⚙️ Capabilities**")
@@ -130,15 +126,11 @@ with st.sidebar:
         st.session_state.pending = None
         st.rerun()
 
-# ─────────────────────────────────────────────────────────────────────────────
-# HEADER
-# ─────────────────────────────────────────────────────────────────────────────
-st.markdown('<div class="agent-title">🤖 DataSmith AI Agent</div>', unsafe_allow_html=True)
+
+st.markdown('<div class="agent-title">🤖 Infera AI Agent</div>', unsafe_allow_html=True)
 st.markdown('<div class="agent-sub">Multi-modal · PDF · Audio · Images · Code · Comparison · Groq LLM</div>', unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────────────────────────────────────
-# CHAT DISPLAY
-# ─────────────────────────────────────────────────────────────────────────────
+
 for msg in st.session_state.chat:
     if msg["role"] == "user":
         ftags = "".join(f'<span class="ftag">📎 {f}</span>' for f in msg.get("files", []))
@@ -156,13 +148,11 @@ for msg in st.session_state.chat:
         ppills = "".join(f'<span class="pill">→ {s}</span>' for s in plan)
         prow = f'<div style="margin-top:8px;font-size:.72rem;color:#555">{ppills}</div>' if ppills else ""
         st.markdown(
-            f'<div class="bubble-bot"><div class="lbl lbl-b">DATASMITH</div>{ibadge}{msg["content"]}{prow}</div>',
+            f'<div class="bubble-bot"><div class="lbl lbl-b">Infera AI</div>{ibadge}{msg["content"]}{prow}</div>',
             unsafe_allow_html=True,
         )
 
-# ─────────────────────────────────────────────────────────────────────────────
-# INPUT
-# ─────────────────────────────────────────────────────────────────────────────
+
 st.divider()
 query = st.text_area(
     "Your message",
@@ -185,9 +175,7 @@ with col1:
 with col2:
     send_clicked = st.button(" Send", type="primary", use_container_width=True)
 
-# ─────────────────────────────────────────────────────────────────────────────
-# STAGE → SEND → DISPLAY
-# ─────────────────────────────────────────────────────────────────────────────
+
 if send_clicked and (query.strip() or uploaded):
     # Stage everything NOW before Streamlit clears uploader
     st.session_state.pending = {
@@ -202,12 +190,12 @@ if send_clicked and (query.strip() or uploaded):
     })
     st.rerun()
 
-# ── Process pending request ──────────────────────────────────────────────────
+
 if st.session_state.pending:
     pending = st.session_state.pending
-    st.session_state.pending = None   # clear immediately
+    st.session_state.pending = None   
 
-    with st.spinner("🧠 DataSmith is thinking..."):
+    with st.spinner("🧠 Infera AI is thinking..."):
         try:
             files_payload = [
                 ("files", (fname, data))
@@ -224,12 +212,12 @@ if st.session_state.pending:
             meta = {"intent": result.get("intent", ""), "plan": result.get("plan", [])}
         except requests.exceptions.ConnectionError:
             bot_reply = (
-                "❌ **Cannot connect to the backend.**\n\n"
+                " **Cannot connect to the backend.**\n\n"
                 "Start it with:\n```bash\ncd datasmith\nuvicorn main:app --reload\n```"
             )
             meta = {}
         except Exception as e:
-            bot_reply = f"❌ Error: {e}"
+            bot_reply = f" Error: {e}"
             meta = {}
 
     st.session_state.chat.append({
@@ -238,11 +226,9 @@ if st.session_state.pending:
     "meta": meta
     })
 
-# Clear query textbox
-   # st.session_state.query_input = ""
     st.session_state.input_key += 1
 
-# Reset file uploader
+
     st.session_state.uploader_key += 1
     
 

@@ -4,8 +4,9 @@ from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
 from backend.agent import Agent
+# from agent import Agent
 
-app = FastAPI(title="DataSmith AI Agent API")
+app = FastAPI(title="Infera AI Agent API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -20,7 +21,7 @@ TEMP_DIR = "temp"
 
 @app.get("/")
 def health():
-    return {"status": "DataSmith Agent API running 🚀"}
+    return {"status": "Infera Agent API running 🚀"}
 
 
 @app.post("/run-agent")

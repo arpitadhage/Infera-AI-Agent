@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 app = FastAPI(
-    title="Datasmith Agent",
+    title="Infera AI Agent",
     version="1.0.0"
 )
 
@@ -10,5 +10,5 @@ app = FastAPI(
 def health_check():
     return {
         "status": "running",
-        "message": "Datasmith Agent Backend"
+        "message": "Infera AI Agent Backend"
     }

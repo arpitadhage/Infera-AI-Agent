@@ -5,7 +5,7 @@ def conversational_answer(state):
     response = f"""
 Hello! 👋
 
-I am your DataSmith AI Agent.
+I am your Infera AI Agent.
 
 I can help you with:
 - PDF / Image / Audio summarization

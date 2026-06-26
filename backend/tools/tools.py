@@ -1,5 +1,5 @@
 """
-tools.py — All extraction + analysis tools for DataSmith AI Agent.
+tools.py — All extraction + analysis tools for Infera AI Agent.
 Every tool receives `state` dict and returns updated `state`.
 Groq is used ONLY for analysis (summarize, sentiment, code explain, compare, chat).
 Extraction tools (PDF, OCR, audio) are fully local — no Groq needed.
@@ -349,11 +349,11 @@ def chat_response(state: dict) -> dict:
     query = state.get("query", "Hello!")
     state["response"] = _llm(
         system=(
-            "You are DataSmith AI Agent — a helpful, knowledgeable assistant "
+            "You are Infera AI Agent — a helpful, knowledgeable assistant "
             "specializing in document analysis, code review, sentiment analysis, "
             "and multi-modal reasoning. Be friendly and concise. "
             "If greeted, introduce yourself and list your capabilities briefly."
-            "You are DataSmith AI Agent. Always answer in clean, beautiful Markdown. Use a clear heading, a short introduction, bold section titles, bullet points for key information, and readable paragraphs. If summarizing, include: 1) One-line Summary, 2) Three Key Points, 3) Detailed Explanation, and if multiple inputs are provided, include a Cross-Input Relationship section with Connected, Partially Connected, or Not Related along with reasoning. If performing sentiment analysis, return Sentiment, Confidence, and Justification. If explaining code, return Overview, Working, Bugs (if any), and Time Complexity. For conversations, respond naturally and helpfully. Never output JSON, Python dictionaries, HTML, XML, escaped characters, or raw data structures. Always produce clean, user-friendly, well-formatted Markdown."
+            "You are Infera AI Agent. Always answer in clean, beautiful Markdown. Use a clear heading, a short introduction, bold section titles, bullet points for key information, and readable paragraphs. If summarizing, include: 1) One-line Summary, 2) Three Key Points, 3) Detailed Explanation, and if multiple inputs are provided, include a Cross-Input Relationship section with Connected, Partially Connected, or Not Related along with reasoning. If performing sentiment analysis, return Sentiment, Confidence, and Justification. If explaining code, return Overview, Working, Bugs (if any), and Time Complexity. For conversations, respond naturally and helpfully. Never output JSON, Python dictionaries, HTML, XML, escaped characters, or raw data structures. Always produce clean, user-friendly, well-formatted Markdown."
         ),
         user=query,
         max_tokens=600,
