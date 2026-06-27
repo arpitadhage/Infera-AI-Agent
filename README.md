@@ -6,9 +6,10 @@ Built as part of a **Generative AI Internship Assignment**, this project demonst
 
 ---
 
-## 🔗 **Live Demo**
+## 🔗 **Live Link**
 
 **Live App:** https://infera-ai-agent-frontend-repo.onrender.com
+<br>
 **Backend API:** https://infera-ai-agent-backend-repo.onrender.com
 
 ---
