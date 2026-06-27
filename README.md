@@ -6,9 +6,10 @@ Built as part of a **Generative AI Internship Assignment**, this project demonst
 
 ---
 
-## 🚀 **Live Demo**
+## 🔗 **Live Demo**
 
-🔗 [[Live](https://infera-ai-agent-frontend-repo.onrender.com/)]
+**Live App:** https://infera-ai-agent-frontend-repo.onrender.com
+**Backend API:** https://infera-ai-agent-backend-repo.onrender.com
 
 ---
 
@@ -95,6 +96,78 @@ Final Structured Text Output
 - 📄 PDF Processing: PyMuPDF 
 - 🐳 Deployment: Docker, Render 
 
+---
+
+---
+## 📁 Folder Structure
+
+```text
+Infera-AI-Agent/
+├── .gitignore
+├── backend/
+│   ├── __init__.py
+│   ├── .dockerignore
+│   ├── agent.py
+│   ├── agents/
+│   │   ├── __init__.py
+│   │   ├── __pycache__/
+│   │   │   ├── __init__.cpython-310.pyc
+│   │   │   ├── executer.cpython-310.pyc
+│   │   │   ├── executor.cpython-310.pyc
+│   │   │   ├── planner.cpython-310.pyc
+│   │   │   └── router.cpython-310.pyc
+│   │   ├── executor.py
+│   │   ├── planner.py
+│   │   └── router.py
+│   ├── api/
+│   │   ├── __init__.py
+│   │   └── main.py
+│   ├── config.py
+│   ├── Dockerfile
+│   ├── main.py
+│   ├── requirements.txt
+│   └── tools/
+│       ├── __init__.py
+│       ├── __pycache__/
+│       │   ├── __init__.cpython-310.pyc
+│       │   ├── audio_tool.cpython-310.pyc
+│       │   ├── comparison_tool.cpython-310.pyc
+│       │   ├── detect_urls.cpython-310.pyc
+│       │   ├── image_tool.cpython-310.pyc
+│       │   ├── pdf_tool.cpython-310.pyc
+│       │   ├── process_urls.cpython-310.pyc
+│       │   ├── registry.cpython-310.pyc
+│       │   ├── summary_tool.cpython-310.pyc
+│       │   ├── url_tool.cpython-310.pyc
+│       │   └── youtube_tool.cpython-310.pyc
+│       ├── audio_tool.py
+│       ├── code_tool.py
+│       ├── comparison_tool.py
+│       ├── context_builder.py
+│       ├── conversational_tool.py
+│       ├── cross_input_tool.py
+│       ├── detect_urls.py
+│       ├── docx_tool.py
+│       ├── groq_client.py
+│       ├── image_tool.py
+│       ├── pdf_tool.py
+│       ├── process_urls.py
+│       ├── registry.py
+│       ├── sentiment_tool.py
+│       ├── summary_tool.py
+│       ├── text_tool.py
+│       ├── tools.py
+│       ├── url_tool.py
+│       └── youtube_tool.py
+├── frontend/
+│   ├── .dockerignore
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── streamlit_app.py
+├── LICENSE
+├── README.md
+└── requirements.txt
+```
 ---
 
 ## ⚙️ **Installation & Setup**
